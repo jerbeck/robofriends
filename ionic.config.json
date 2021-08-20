@@ -1,7 +1,0 @@
-{
-  "name": "RoboFriends",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "react"
-}
