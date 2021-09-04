@@ -1,18 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider, connect } from 'react-redux';
-import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
+import { createLogger } from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
 import './index.css';
 import App from './containers/App';
 import 'tachyons';
 import reportWebVitals from './reportWebVitals';
-import { searchRobots } from './reducers'
+import { searchRobots, requestRobots } from './reducers'
 
-const store = createStore(searchRobots);
+const logger = createLogger();
+
+const rootReducer = combineReducers({ searchRobots, requestRobots })
+
+// DEBUGGING - Comment this out
+const composeEnhancers =
+  typeof window === 'object' &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?   
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+    }) : compose;
+
+const enhancer = composeEnhancers(
+  applyMiddleware(thunkMiddleware, logger),
+  // other store enhancers if any
+);
+const store = createStore(rootReducer, enhancer);
+
+// Release
+// const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
 
 ReactDOM.render(
   <React.StrictMode>
-    <App store={store} />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
